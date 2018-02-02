@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE Safe       #-}
 -- | Public core API for Tox clients.
