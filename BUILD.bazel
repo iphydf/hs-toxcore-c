@@ -4,25 +4,10 @@ load("//tools/project:build_defs.bzl", "project")
 
 project(license = "gpl3-https")
 
-#[genrule(
-#    name = "api_" + src[:-2].replace("/", "_"),
-#     srcs = ["//c-toxcore:" + src],
-#     outs = ["src/FFI/%s.hs" % "/".join([mod.capitalize() for mod in src[:-2].split("/")])],
-#     cmd = "$(location //hs-apigen/tools:apigen) -hs $< > $@",
-#     tools = ["//hs-apigen/tools:apigen"],
-#     tags = ["no-cross", "haskell"],
-# ) for src in [
-#     "tox/tox.h",
-# ]]
-
 haskell_library(
     name = "hs-toxcore-c",
-    srcs = glob(
-        ["src/**/*.*hs"],
-        #exclude = ["src/FFI/**"],
-    ) + [
-        #":api_tox_tox",
-    ],
+    srcs = glob(["src/**/*.hs"]),
+    linkstatic = True,
     src_strip_prefix = "src",
     tags = [
         "haskell",
@@ -32,28 +17,22 @@ haskell_library(
     visibility = ["//visibility:public"],
     deps = [
         "//c-toxcore",
-        "//hs-msgpack-binary",
-        "//third_party/haskell:QuickCheck",
         "//third_party/haskell:base",
         "//third_party/haskell:bytestring",
-        "//third_party/haskell:generic-arbitrary",
-        "//third_party/haskell:quickcheck-instances",
+        "//third_party/haskell:containers",
+        "//third_party/haskell:vector",
     ],
 )
 
 hspec_test(
     name = "testsuite",
-    timeout = "short",
+    timeout = "moderate",
+    ghcopts = ["-Wno-missed-extra-shared-lib"],
+    linkstatic = True,
     deps = [
         ":hs-toxcore-c",
-        "//hs-msgpack-binary",
-        "//third_party/haskell:QuickCheck",
         "//third_party/haskell:base",
-        "//third_party/haskell:base16-bytestring",
         "//third_party/haskell:bytestring",
-        "//third_party/haskell:cryptohash",
         "//third_party/haskell:hspec",
-        "//third_party/haskell:saltine",
-        "//third_party/haskell:vector",
     ],
 )

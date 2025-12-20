@@ -1,36 +1,38 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE ScopedTypeVariables        #-}
-{-# LANGUAGE StrictData                 #-}
-module Foreign.C.Enum where
+-- | C enums as Haskell sum types, marshalled by their real C values.
+module Foreign.C.Enum
+    ( CEnum (..)
+    , CErr
+    , callErrFun
+    , callErrFun_
+    , unknownCEnum
+    ) where
 
 import           Foreign.C.Types       (CInt)
 import           Foreign.Marshal.Alloc (alloca)
 import           Foreign.Ptr           (Ptr)
-import           Foreign.Storable      (Storable (..))
+import           Foreign.Storable      (peek, poke)
 
+-- | A Haskell type for a C enum. Error enums leave out their OK value.
+class CEnum a where
+    toCEnum   :: a -> CInt
+    fromCEnum :: CInt -> a
 
-newtype CEnum a = CEnum { unCEnum :: CInt }
-  deriving (Storable)
+-- | A C error out-parameter, which C sets to 0 on success.
+type CErr = Ptr CInt
 
-instance (Enum a, Show a) => Show (CEnum a) where
-  show cen = show (toEnum $ fromIntegral $ unCEnum cen :: a)
-
-
-toCEnum :: Enum a => a -> CEnum a
-toCEnum = CEnum . fromIntegral . fromEnum
-
-
-fromCEnum :: Enum a => CEnum a -> a
-fromCEnum = toEnum . fromIntegral . unCEnum
-
-
-type CErr err = Ptr (CEnum err)
-
-callErrFun :: (Eq err, Enum err, Bounded err)
-           => (CErr err -> IO r) -> IO (Either err r)
+-- | Calls a C function with an error out-parameter.
+callErrFun :: CEnum err => (CErr -> IO r) -> IO (Either err r)
 callErrFun f = alloca $ \errPtr -> do
-  res <- f errPtr
-  err <- unCEnum <$> peek errPtr
-  return $ if err > 0
-    then Left . toEnum . fromIntegral $ err - 1
-    else Right res
+    poke errPtr 0
+    result <- f errPtr
+    err <- peek errPtr
+    return $ if err == 0 then Right result else Left (fromCEnum err)
+
+-- | 'callErrFun' for a function whose result only says whether it worked.
+callErrFun_ :: CEnum err => (CErr -> IO r) -> IO (Either err ())
+callErrFun_ f = fmap (() <$) (callErrFun f)
+
+-- | A C value the bindings don't know, from a toxcore other than the one they
+-- were generated for.
+unknownCEnum :: String -> CInt -> a
+unknownCEnum name value = error $ "unknown " <> name <> " value " <> show value

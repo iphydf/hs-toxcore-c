@@ -1,40 +1,32 @@
+-- | The Tox API, safe to use from Haskell. Start with 'withTox'.
 module Network.Tox.C
-  ( module M
-  ) where
+    ( module Network.Tox.C.Constants
+    , module Network.Tox.C.Types
+    , module Network.Tox.C.Lifecycle
+    , module Network.Tox.C.Conference
+    , module Network.Tox.C.File
+    , module Network.Tox.C.Friend
+    , module Network.Tox.C.Group
+    , module Network.Tox.C.EncryptSave
+    , module Network.Tox.C.Tox
+    , module Network.Tox.C.Av
+    , module Network.Tox.C.Options
+    , module Network.Tox.C.Events
+    , FixedBytes (fixedSize, toBytes)
+    , fromBytes
+    ) where
 
-import           FFI.Tox.Tox              as M (Connection (..),
-                                                ErrBootstrap (..),
-                                                ErrConferenceDelete (..),
-                                                ErrConferenceGetType (..),
-                                                ErrConferenceInvite (..),
-                                                ErrConferenceJoin (..),
-                                                ErrConferenceNew (..),
-                                                ErrConferencePeerQuery (..),
-                                                ErrConferenceSendMessage (..),
-                                                ErrConferenceTitle (..),
-                                                ErrFileControl (..),
-                                                ErrFileGet (..),
-                                                ErrFileSeek (..),
-                                                ErrFileSend (..),
-                                                ErrFileSendChunk (..),
-                                                ErrFriendAdd (..),
-                                                ErrFriendByPublicKey (..),
-                                                ErrFriendCustomPacket (..),
-                                                ErrFriendDelete (..),
-                                                ErrFriendGetLastOnline (..),
-                                                ErrFriendGetPublicKey (..),
-                                                ErrFriendQuery (..),
-                                                ErrFriendSendMessage (..),
-                                                ErrGetPort (..), ErrNew (..),
-                                                ErrSetInfo (..),
-                                                ErrSetTyping (..),
-                                                FileKind (..), LogLevel (..),
-                                                MessageType (..),
-                                                ProxyType (..),
-                                                SavedataType (..), ToxPtr)
-import           Network.Tox.C.Constants  as M
-import           Network.Tox.C.Options    as M
-import           Network.Tox.C.Tox        as M
-import           Network.Tox.C.Type       as M
-import           Network.Tox.C.Version    as M
-import           Network.Tox.Types.Events as M
+import           Network.Tox.C.Av
+import           Network.Tox.C.Conference
+import           Network.Tox.C.Constants
+import           Network.Tox.C.EncryptSave
+import           Network.Tox.C.Events
+import           Network.Tox.C.File
+import           Network.Tox.C.Friend
+import           Network.Tox.C.Group
+import           Network.Tox.C.Lifecycle
+import           Network.Tox.C.Marshal     (FixedBytes (fixedSize, toBytes),
+                                            fromBytes)
+import           Network.Tox.C.Options
+import           Network.Tox.C.Tox
+import           Network.Tox.C.Types
